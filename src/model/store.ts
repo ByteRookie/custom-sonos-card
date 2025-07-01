@@ -209,6 +209,10 @@ export default class Store {
     return window.location.href.includes('#') ? window.location.href.replace(/.*#/g, '') : '';
   }
 
+  updateActivePlayer(activePlayerId?: string) {
+    this.activePlayer = this.determineActivePlayer(activePlayerId);
+  }
+
   showPower(hideIfOn = false) {
     if (this.config.hidePlayerControlPowerButton) {
       return [];
