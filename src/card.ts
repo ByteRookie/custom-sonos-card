@@ -24,6 +24,8 @@ export class Card extends LitElement {
   @state() loaderTimestamp!: number;
   @state() cancelLoader!: boolean;
   @state() activePlayerId?: string;
+  private agsPrimarySpeakerUnsub?: Promise<() => void>;
+  private agsStatusUnsub?: Promise<() => void>;
 
   render() {
     this.createStore();
@@ -121,6 +123,12 @@ export class Card extends LitElement {
     }
     window.addEventListener(CALL_MEDIA_STARTED, this.callMediaStartedListener);
     window.addEventListener(CALL_MEDIA_DONE, this.callMediaDoneListener);
+    if (this.config.agsPrimarySpeakerSensor) {
+      this.agsPrimarySpeakerUnsub = this.hass.connection.subscribeEvents(this.agsStateListener, 'state_changed');
+    }
+    if (this.config.agsStatusSensor) {
+      this.agsStatusUnsub = this.hass.connection.subscribeEvents(this.agsStateListener, 'state_changed');
+    }
     window.addEventListener('hashchange', () => {
       this.activePlayerId = undefined;
       this.createStore();
@@ -129,6 +137,12 @@ export class Card extends LitElement {
 
   disconnectedCallback() {
     window.removeEventListener(ACTIVE_PLAYER_EVENT, this.activePlayerListener);
+    if (this.agsPrimarySpeakerUnsub) {
+      this.agsPrimarySpeakerUnsub.then((unsub) => unsub());
+    }
+    if (this.agsStatusUnsub) {
+      this.agsStatusUnsub.then((unsub) => unsub());
+    }
     super.disconnectedCallback();
   }
 
@@ -167,9 +181,21 @@ export class Card extends LitElement {
     const newEntityId = (event as CustomEvent).detail.entityId;
     if (newEntityId !== this.activePlayerId) {
       this.activePlayerId = newEntityId;
+      this.store.updateActivePlayer(newEntityId);
       if (this.config.sections?.includes(PLAYER)) {
         this.section = PLAYER;
       }
+      this.requestUpdate();
+    }
+  };
+
+  private agsStateListener = (event: { data: { entity_id: string } }) => {
+    if (
+      event.data.entity_id === this.config.agsPrimarySpeakerSensor ||
+      event.data.entity_id === this.config.agsStatusSensor
+    ) {
+      this.activePlayerId = undefined;
+      this.createStore();
       this.requestUpdate();
     }
   };
