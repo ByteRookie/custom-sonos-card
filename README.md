@@ -148,6 +148,9 @@ predefinedGroups: # defaults to empty
       - media_player.tv
 skipApplyButtonWhenGrouping: true # default is false. Will skip the apply button when grouping.
 dontSwitchPlayerWhenGrouping: true # default is false. Will not switch to another player if main player is ungrouped.
+agsSystemSwitch: switch.sonos_ags # Optional switch controlling AGS
+agsStatusSensor: sensor.sonos_ags_status # Optional sensor reporting AGS status
+agsRoomSwitchPrefix: switch.room_ # Prefix for room switches used by AGS
 groupingButtonIcons: # Use this to set custom icons for the grouping buttons.
   predefinedGroup: mdi:account-group # default is mdi:speaker-multiple
   joinAll: mdi:account-multiple # default is mdi:checkbox-multiple-marked-outline

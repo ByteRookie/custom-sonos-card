@@ -88,6 +88,9 @@ export interface CardConfig extends LovelaceCardConfig {
   playerVolumeEntityId?: string;
   allowPlayerVolumeEntityOutsideOfGroup?: boolean;
   dontSwitchPlayerWhenGrouping?: boolean;
+  agsSystemSwitch?: string;
+  agsStatusSensor?: string;
+  agsRoomSwitchPrefix?: string;
   showSourceInPlayer?: boolean;
   showBrowseMediaInPlayerSection?: boolean;
   showChannelInPlayer?: boolean;
