@@ -108,6 +108,9 @@ widthPercentage: 75 # default is 100. Use this to change the width of the card.
 heightPercentage: 75 # default is 100. Use this to change the height of the card. Set to 'auto' to make the card height adjust to the content.
 footerHeight: 4 # default is 5. Unit is 'rem'. Use this to change the height of the footer.
 entityId: media_player.bedroom # Forces this player to be the selected one on loading the card (overrides url param etc)
+agsStatusSensor: sensor.ags_status # optional. If this sensor's state is OFF the AGS logic is skipped
+agsPrimarySpeakerSensor: sensor.ags_primary_speaker # optional. Holds the primary speaker entity id used by AGS
+agsPreferredPrimarySensor: sensor.ags_preferred_primary # optional fallback entity id when primary speaker is not set
 entityNameRegexToReplace: ' PLAYER' # Regex pattern to replace parts of the entity names
 entityNameReplacement: ''
 volumeStepSize: 1 # Use this to change the step size when using volume up/down. Default is to use the step size of Home Assistant's media player integration. 
