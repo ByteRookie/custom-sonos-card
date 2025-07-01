@@ -102,6 +102,11 @@ export interface CardConfig extends LovelaceCardConfig {
   stopInsteadOfPause?: boolean;
   inverseGroupMuteState?: boolean;
   sortFavoritesByType?: boolean;
+  agsPrimarySpeakerSensor?: string; // sensor.ags_primary_speaker
+  agsPreferredPrimarySensor?: string; // sensor.ags_preferred_primary
+  agsStatusSensor?: string; // sensor.ags_status
+  agsSystemSwitch?: string; // switch.media_system
+  agsRoomSwitchPrefix?: string; // prefix for per-room switches
 }
 
 export interface MediaArtworkOverride {
