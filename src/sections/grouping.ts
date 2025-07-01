@@ -21,6 +21,7 @@ export class Grouping extends LitElement {
   @state() modifiedItems: string[] = [];
   @state() selectedPredefinedGroup?: PredefinedGroup;
   private config!: CardConfig;
+  @state() private agsSwitchOn = false;
 
   render() {
     this.config = this.store.config;
@@ -35,22 +36,48 @@ export class Grouping extends LitElement {
       this.applyGrouping();
     }
 
+    const agsSwitchState = this.config.agsSystemSwitch
+      ? this.store.hass.states[this.config.agsSystemSwitch]?.state === 'on'
+      : false;
+    const agsStatusState = this.config.agsStatusSensor
+      ? this.store.hass.states[this.config.agsStatusSensor]?.state === 'on'
+      : false;
+    this.agsSwitchOn = agsSwitchState;
+    const agsActive = agsSwitchState || agsStatusState;
+
     return html`
       <div class="wrapper">
         <div class="predefined-groups">
-          ${this.renderJoinAllButton()} ${this.renderUnJoinAllButton()}
-          ${when(this.store.predefinedGroups, () => this.renderPredefinedGroups())}
+          ${this.renderAgsSwitch(agsSwitchState)}
+          ${agsActive
+            ? nothing
+            : html`${this.renderJoinAllButton()}
+              ${this.renderUnJoinAllButton()}${when(this.store.predefinedGroups, () => this.renderPredefinedGroups())}`}
         </div>
         <div class="list">
           ${this.groupingItems.map((item) => {
+            const roomSwitch = this.config.agsRoomSwitchPrefix
+              ? `${this.config.agsRoomSwitchPrefix}${item.player.id.replace('media_player.', '')}`
+              : '';
+            const roomSwitchState = roomSwitch ? this.store.hass.states[roomSwitch]?.state === 'on' : false;
             return html`
-              <div class="item" modified=${item.isModified || nothing} disabled=${item.isDisabled || nothing}>
-                <ha-icon
-                  class="icon"
-                  selected=${item.isSelected || nothing}
-                  .icon="mdi:${item.icon}"
-                  @click=${() => this.toggleItem(item)}
-                ></ha-icon>
+              <div
+                class="item"
+                modified=${(!agsActive && item.isModified) || nothing}
+                disabled=${(!agsActive && item.isDisabled) || nothing}
+              >
+                ${agsActive
+                  ? html`<ha-switch
+                      class="icon"
+                      .checked=${roomSwitchState}
+                      @change=${(ev: Event) => this.toggleRoomSwitch(ev, roomSwitch)}
+                    ></ha-switch>`
+                  : html`<ha-icon
+                      class="icon"
+                      selected=${item.isSelected || nothing}
+                      .icon="mdi:${item.icon}"
+                      @click=${() => this.toggleItem(item)}
+                    ></ha-icon>`}
                 <div class="name-and-volume">
                   <span class="name">${item.name}</span>
                   <sonos-volume
@@ -67,7 +94,8 @@ export class Grouping extends LitElement {
         </div>
         <ha-control-button-group
           class="buttons"
-          hide=${(this.modifiedItems.length === 0 && !this.selectedPredefinedGroup) ||
+          hide=${agsActive ||
+          (this.modifiedItems.length === 0 && !this.selectedPredefinedGroup) ||
           this.config.skipApplyButtonWhenGrouping ||
           nothing}
         >
@@ -302,6 +330,32 @@ export class Grouping extends LitElement {
       if ((!item.isMain && item.isSelected) || (item.isMain && !item.isSelected)) {
         this.toggleItem(item);
       }
+    });
+  }
+
+  private renderAgsSwitch(checked: boolean) {
+    return this.config.agsSystemSwitch
+      ? html`<ha-switch .checked=${checked} @change=${this.toggleAgsSystem}></ha-switch>`
+      : nothing;
+  }
+
+  private async toggleAgsSystem(ev: Event) {
+    if (!this.config.agsSystemSwitch) {
+      return;
+    }
+    const checked = (ev.target as HTMLInputElement).checked;
+    await this.store.hass.callService('switch', checked ? 'turn_on' : 'turn_off', {
+      entity_id: this.config.agsSystemSwitch,
+    });
+  }
+
+  private async toggleRoomSwitch(ev: Event, switchId: string) {
+    if (!switchId) {
+      return;
+    }
+    const checked = (ev.target as HTMLInputElement).checked;
+    await this.store.hass.callService('switch', checked ? 'turn_on' : 'turn_off', {
+      entity_id: switchId,
     });
   }
 }
