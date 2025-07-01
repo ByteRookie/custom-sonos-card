@@ -162,6 +162,18 @@ export const ADVANCED_SCHEMA = [
     selector: { boolean: {} },
   },
   {
+    name: 'agsSystemSwitch',
+    selector: { entity: { multiple: false, filter: { domain: 'switch' } } },
+  },
+  {
+    name: 'agsStatusSensor',
+    selector: { entity: { multiple: false, filter: { domain: 'sensor' } } },
+  },
+  {
+    name: 'agsRoomSwitchPrefix',
+    type: 'string',
+  },
+  {
     name: 'sortFavoritesByType',
     selector: { boolean: {} },
   },

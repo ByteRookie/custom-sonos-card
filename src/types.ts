@@ -96,6 +96,9 @@ export interface CardConfig extends LovelaceCardConfig {
   fastForwardAndRewindStepSizeSeconds?: number;
   groupingButtonIcons?: GroupingButtonIcons;
   sectionButtonIcons?: SectionButtonIcons;
+  agsSystemSwitch?: string;
+  agsStatusSensor?: string;
+  agsRoomSwitchPrefix?: string;
   footerHeight?: number;
   mediaTitleRegexToReplace?: string;
   mediaTitleReplacement?: string;
