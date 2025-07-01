@@ -232,6 +232,11 @@ hideBrowseMediaButton: true # default is false. Hides the button to open the med
 replaceHttpWithHttpsForThumbnails: true # default is false. Use this if you  want to replace http with https for thumbnails. 
 mediaBrowserTitle: My favorites # default is 'All favorites'. Use this to change the title for the media browser/favorites section.
 sortFavoritesByType: true # default is false. Will group favorites by type (e.g. radio, playlist, album).
+agsPrimarySpeakerSensor: sensor.ags_primary_speaker
+agsPreferredPrimarySensor: sensor.ags_preferred_primary
+agsStatusSensor: sensor.ags_status
+agsSystemSwitch: switch.media_system
+agsRoomSwitchPrefix: switch.media_room_
 
 # volumes specific
 hideVolumeCogwheel: true # default is false. Will hide the cogwheel for the volumes section.
