@@ -173,6 +173,16 @@ export class Grouping extends LitElement {
     this.selectedPredefinedGroup = undefined;
   }
 
+  private isAgsActive() {
+    if (this.config.agsSystemSwitch) {
+      return this.store.hass.states[this.config.agsSystemSwitch]?.state === 'on';
+    }
+    if (this.config.agsStatusSensor) {
+      return this.store.hass.states[this.config.agsStatusSensor]?.state === 'on';
+    }
+    return false;
+  }
+
   async applyGrouping() {
     const groupingItems = this.groupingItems;
     const joinedPlayers = this.joinedPlayers;
@@ -181,12 +191,20 @@ export class Grouping extends LitElement {
     this.modifiedItems = [];
     const selectedPredefinedGroup = this.selectedPredefinedGroup;
     this.selectedPredefinedGroup = undefined;
-
-    if (join.length > 0) {
-      await this.mediaControlService.join(newMainPlayer, join);
-    }
-    if (unJoin.length > 0) {
-      await this.mediaControlService.unJoin(unJoin);
+    if (this.isAgsActive()) {
+      const prefix = this.config.agsRoomSwitchPrefix || '';
+      for (const item of groupingItems) {
+        const roomSwitch = `${prefix}${item.player.name.toLowerCase().replace(/\s+/g, '_')}`;
+        const service = item.isSelected ? 'turn_on' : 'turn_off';
+        await this.store.hass.callService('switch', service, { entity_id: roomSwitch });
+      }
+    } else {
+      if (join.length > 0) {
+        await this.mediaControlService.join(newMainPlayer, join);
+      }
+      if (unJoin.length > 0) {
+        await this.mediaControlService.unJoin(unJoin);
+      }
     }
     if (selectedPredefinedGroup) {
       await this.mediaControlService.setVolumeAndMediaForPredefinedGroup(selectedPredefinedGroup);
