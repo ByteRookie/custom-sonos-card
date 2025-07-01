@@ -174,6 +174,29 @@ export default class Store {
   }
 
   private determineActivePlayer(activePlayerId?: string): MediaPlayer {
+    const agsStatusEntity = this.config.agsStatusSensor;
+    const agsPrimaryEntity = this.config.agsPrimarySpeakerSensor;
+    const agsPreferredEntity = this.config.agsPreferredPrimarySensor;
+
+    if (agsStatusEntity) {
+      const agsStatus = this.hass.states[agsStatusEntity]?.state;
+      if (agsStatus && agsStatus !== 'OFF') {
+        let agsPlayerId = agsPrimaryEntity ? this.hass.states[agsPrimaryEntity]?.state : undefined;
+
+        if (!agsPlayerId || agsPlayerId === 'None') {
+          agsPlayerId = agsPreferredEntity ? this.hass.states[agsPreferredEntity]?.state : undefined;
+        }
+
+        const agsGroup = agsPlayerId
+          ? this.allGroups.find((group) => group.getMember(agsPlayerId!) !== undefined)
+          : undefined;
+
+        if (agsGroup) {
+          return agsGroup;
+        }
+      }
+    }
+
     const playerId = activePlayerId || this.config.entityId || this.getActivePlayerFromUrl();
     return (
       this.allGroups.find((group) => group.getMember(playerId) !== undefined) ||

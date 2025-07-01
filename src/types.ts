@@ -46,6 +46,9 @@ export interface CardConfig extends LovelaceCardConfig {
   hidePlayerControlPowerButton?: boolean;
   showVolumeUpAndDownButtons?: boolean;
   entityId?: string;
+  agsStatusSensor?: string;
+  agsPrimarySpeakerSensor?: string;
+  agsPreferredPrimarySensor?: string;
   entities?: string[];
   excludeItemsInEntitiesList?: boolean;
   predefinedGroups?: ConfigPredefinedGroup[];
